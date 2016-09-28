@@ -22,15 +22,17 @@ $SPEC{numseq} = {
     args => {
         name => {
             summary => 'Sequence name',
-            schema => ['str*', {qin=>[
+            schema => ['str*', {in=>[
                 'fib', 'fibonacci',
+                'squares',
+                'fact', 'factorial',
             ]}],
             req => 1,
             pos => 0,
         },
-        start_numbers => {
+        params => {
             'x.name.is_plural' => 1,
-            'x.name.singular' => 'start_number',
+            'x.name.singular' => 'param',
             schema => ['array*', of=>'int*'],
             pos => 1,
             greedy => 1,
@@ -58,13 +60,13 @@ sub numseq {
     my %args = @_;
 
     my $name = $args{name};
-    my $start_numbers = $args{start_numbers} // [];
+    my $params = $args{params} // [];
 
     my $func;
     if ($name eq 'fib' || $name eq 'fibonacci') {
         return [400, "Please supply 2 starting numbers"]
-            unless @$start_numbers == 2;
-        my ($a, $b) = @$start_numbers;
+            unless @$params == 2;
+        my ($a, $b) = @$params;
         my $i = 0;
         $func = sub {
             $i++;
@@ -78,6 +80,32 @@ sub numseq {
                 $a = $b;
                 $b = $res;
             }
+            return ref($res) eq 'Math::BigInt' ? $res->bstr : $res;
+        };
+    } elsif ($name eq 'squares') {
+        #return [400, "Please supply at most one starting number"]
+        #    unless @$params <= 1;
+        return [400, "Extra parameters not allowed"] if @$params;
+        my $i = $params->[0] // 1;
+        $func = sub {
+            my $res;
+            $res = $i*$i;
+            $i++;
+            return ref($res) eq 'Math::BigInt' ? $res->bstr : $res;
+        };
+    } elsif ($name eq 'fact' || $name eq 'factorial') {
+        #return [400, "Please supply at most one starting number"]
+        #    unless @$params <= 1;
+        return [400, "Extra parameters not allowed"] if @$params;
+        my $i = $params->[0] // 1;
+        my $res;
+        $func = sub {
+            if ($i == 1) {
+                $res = $i;
+            } else {
+                $res *= $i;
+            }
+            $i++;
             return ref($res) eq 'Math::BigInt' ? $res->bstr : $res;
         };
     }
