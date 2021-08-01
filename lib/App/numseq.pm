@@ -1,6 +1,8 @@
 package App::numseq;
 
+# AUTHORITY
 # DATE
+# DIST
 # VERSION
 
 use 5.010001;
@@ -116,3 +118,9 @@ sub numseq {
 # ABSTRACT:
 
 =head1 DESCRIPTION
+
+
+=head1 SEE ALSO
+
+These modules also have "numseq" in them, but they are only tangentially
+related: L<NumSeq::Iter>, L<App::seq::numseq>, L<Sah::Schemas::NumSeq>.
